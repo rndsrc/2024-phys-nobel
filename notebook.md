@@ -50,7 +50,7 @@ class IsingModel:
         self.T = T
         self.grid = np.random.choice([-1,1], size=shape)
         self.magnetization = [np.sum(self.grid)]
-        
+
     def dE(self, i, j):
         I,J = self.grid.shape
         return 2 * self.grid[i,j] * (
@@ -69,7 +69,7 @@ class IsingModel:
         self.magnetization.append(m)
 
     def run(self, N):
-        for n in range(N):            
+        for n in range(N):
             self.step()
 
     def plot(self):
@@ -82,4 +82,29 @@ class IsingModel:
 I = IsingModel(2)
 I.run(64*64*100)
 I.plot()
+```
+
+## Hopfield Network
+
+The Hopfield network, developed by John Hopfield in 1982, is an artificial neural network model with a deep connection to the Ising model.
+This connection is key to understanding why Hopfield's work, recognized in the 2024 Nobel Prize in Physics, has had such a profound impact on the fields of neural networks and machine learning.
+
+At its core, the Hopfield network functions as a recurrent neural network designed to store and recall patterns.
+Each "neuron" in the network can be in one of two states: active (+1) or inactive (-1).
+This binary nature closely mirrors the spin states in the Ising model, where each spin is either "up" or "down".
+The neurons are interconnected, and the network evolves by updating the state of each neuron based on the states of its neighbors, following rules that minimize the system's overall energy.
+
+What makes this particularly interesting is that the energy minimization process in the Hopfield network is mathematically analogous to how the Ising model works.
+In both systems, there is a well-defined energy function that describes the interaction between units---spins in the Ising model, and neurons in the Hopfield network.
+The system naturally evolves toward a state that minimizes this energy, and for the Hopfield network, these low-energy states correspond to stored memory patterns.
+When a noisy or incomplete input is presented to the network, it "relaxes" into one of these low-energy states, effectively recalling the stored pattern.
+
+This shared framework of energy minimization is what connects the Hopfield network so closely to the Ising model.
+In fact, the mathematical structure of the energy function in a Hopfield network is very similar to the Hamiltonian of the Ising model, where the weights between neurons play a role analogous to the coupling between spins.
+
+The recognition of the Hopfield network in the 2024 Nobel Prize highlights this elegant crossover between physics and neural computation.
+The ideas from statistical mechanics, particularly the energy minimization concepts of the Ising model, laid the groundwork for significant advances in understanding how networks of simple elements---whether spins or neurons---can produce complex, emergent behavior.
+
+```python
+
 ```
