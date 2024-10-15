@@ -136,6 +136,12 @@ I.run(64*64*100)
 plt.imshow(I.state)
 ```
 
+```python
+# TODO: instead of just visualizing the final output, implement a loop to create a movie
+
+...
+```
+
 ## Hopfield Network
 
 The Hopfield network, developed by John Hopfield in 1982, is an artificial neural network model with a deep connection to the Ising model.
@@ -266,4 +272,23 @@ plt.imshow(h.state)
 h.random()
 h.run(256*256)
 plt.imshow(h.state)
+```
+
+```python
+# TODO: load up more images/patterns to train the Hopfield Network
+
+...
+```
+
+```python
+# TODO: implement some control to the radom state so they are more likely
+# to converge to a particular image
+
+...
+```
+
+```python
+# TODO: instead of just visualizing the final output, implement a loop to create a movie
+
+...
 ```
