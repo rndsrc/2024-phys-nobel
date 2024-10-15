@@ -47,42 +47,43 @@ For easy comparison of simulation paramaters, we will implement the Ising model 
 class IsingModel:
 
     def __init__(self, T, shape=(64,64)):
-        """Initialize an Ising model with temperature `T` and grid shape `shape`"""
         self.T = T
-        self.grid = np.random.choice([-1,1], size=shape)
-        self.magnetization = [np.sum(self.grid)]
+        self.state = np.zeros(shape)
 
-    def dE(self, i, j):
-        I,J = self.grid.shape
-        return 2 * self.grid[i,j] * (
-            self.grid[ i     ,(j-1)%J] + self.grid[ i     ,(j+1)%J] +
-            self.grid[(i-1)%I, j     ] + self.grid[(i+1)%I, j     ]
+    def init(self):
+        self.state = np.random.choice([-1,1], size=self.state.shape)
+
+    @staticmethod
+    def dE(state, i,j):
+        I,J = state.shape
+        return 2 * state[i,j] * (
+            state[ i     ,(j-1)%J] +
+            state[ i     ,(j+1)%J] +
+            state[(i-1)%I, j     ] +
+            state[(i+1)%I, j     ]
         )
 
-    def step(self):
-        i  = np.random.randint(0, self.grid.shape[0])
-        j  = np.random.randint(0, self.grid.shape[1])
-        dE = self.dE(i,j)
-        m  = self.magnetization[-1]
-        if dE < 0 or np.random.rand() < np.exp(-dE / self.T):
-            self.grid[i,j] *= -1
-            m += 2 * self.grid[i,j]
-        self.magnetization.append(m)
+    @staticmethod
+    def step(state, i,j, T):
+        dE = IsingModel.dE(state, i,j)
+        if dE < 0 or np.random.rand() < np.exp(-dE / T):
+            state[i,j] *= -1
 
     def run(self, N):
         for n in range(N):
-            self.step()
-
-    def plot(self):
-        fig, (ax0, ax1) = plt.subplots(1,2, figsize=(12,6))
-        ax0.imshow(I.grid)
-        ax1.plot(np.array(I.magnetization) / I.grid.size)
+            i = np.random.randint(0, self.state.shape[0])
+            j = np.random.randint(0, self.state.shape[1])
+            self.step(self.state, i, j, self.T)
 ```
 
 ```python
-I = IsingModel(2)
+I = IsingModel(1)
+```
+
+```python
+I.init()
 I.run(64*64*100)
-I.plot()
+plt.imshow(I.state)
 ```
 
 ## Hopfield Network
@@ -109,28 +110,28 @@ The ideas from statistical mechanics, particularly the energy minimization conce
 ```python
 class HopfieldNetwork:
     def __init__(self, shape=(64,64)):
-        size = np.prod(shape)
-        self.shape   = shape
-        self.weights = np.zeros((size, size))
+        self.state   = np.zeros(shape)
+        self.weights = np.zeros((self.state.size, self.state.size))
 
     def train(self, patterns):
         for p in patterns:
-            p = np.reshape(p, (self.weights.shape[0], 1)) # reshape the pattern to a column vector
-            self.weights += np.dot(p, p.T)                # Hebbian learning rule: W += p * p.T
-        np.fill_diagonal(self.weights, 0) # ensure no neuron connects to itself
-        self.weights /= len(patterns)     # normalize by the number of patterns
+            p = p.flatten()
+            self.weights += np.outer(p, p) # Hebbian learning rule
+        np.fill_diagonal(self.weights, 0)  # ensure no neuron connects to itself
+        self.weights /= len(patterns)      # normalize by the number of patterns
 
     def init(self):
-        self.grid = np.random.choice([-1,1], size=self.shape)
+        self.state = np.random.choice([-1,1], size=self.state.shape)
 
-    def step(self):
-        i = np.random.randint(0, self.shape[0])
-        j = np.random.randint(0, self.shape[1])
-        self.grid[i,j] = np.sign(np.dot(self.weights[i*self.shape[1]+j,:], self.grid.flatten()))
+    @staticmethod
+    def step(state, i, j, weights):
+        state[i,j] = np.sign(np.dot(weights[i*state.shape[1]+j], state.flatten()))
 
     def run(self, N):
         for n in range(N):
-            self.step()
+            i = np.random.randint(0, self.state.shape[0])
+            j = np.random.randint(0, self.state.shape[1])
+            self.step(self.state, i, j, self.weights)
 ```
 
 ```python
@@ -147,21 +148,17 @@ ax1.imshow(C)
 
 ```python
 h = HopfieldNetwork()
-h.train([A,C])
+h.train([A, C])
 ```
 
 ```python
 h.init()
 h.run(256*256)
-plt.imshow(h.grid)
+plt.imshow(h.state)
 ```
 
 ```python
 h.init()
 h.run(256*256)
-plt.imshow(h.grid)
-```
-
-```python
-
+plt.imshow(h.state)
 ```
