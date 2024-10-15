@@ -30,6 +30,56 @@ The Metropolis algorithm (1953) was developed for Monte Carlo simulations of sys
 
 In this hands-on lab, we will implement the Ising model using the Metropolis algorithm in Python.
 
-```python
 
+## An Implementation of an Ising Model
+
+The Ising model is pretty simple so we only need to use two packages, `numpy` for array handing and `matplotlib` for plotting.
+
+```python
+import numpy as np
+from matplotlib import pyplot as plt
+```
+
+For easy comparison of simulation paramaters, we will implement the Ising model as a class.
+
+```python
+class IsingModel:
+
+    def __init__(self, T, shape=(64,64)):
+        """Initialize an Ising model with temperature `T` and grid shape `shape`"""
+        self.T = T
+        self.grid = np.random.choice([-1,1], size=shape)
+        self.magnetization = [np.sum(self.grid)]
+        
+    def dE(self, i, j):
+        I,J = self.grid.shape
+        return 2 * self.grid[i,j] * (
+            self.grid[ i     ,(j-1)%J] + self.grid[ i     ,(j+1)%J] +
+            self.grid[(i-1)%I, j     ] + self.grid[(i+1)%I, j     ]
+        )
+
+    def step(self):
+        i  = np.random.randint(0, self.grid.shape[0])
+        j  = np.random.randint(0, self.grid.shape[1])
+        dE = self.dE(i,j)
+        m  = self.magnetization[-1]
+        if dE < 0 or np.random.rand() < np.exp(-dE / self.T):
+            self.grid[i,j] *= -1
+            m += 2 * self.grid[i,j]
+        self.magnetization.append(m)
+
+    def run(self, N):
+        for n in range(N):            
+            self.step()
+
+    def plot(self):
+        fig, (ax0, ax1) = plt.subplots(1,2, figsize=(12,6))
+        ax0.imshow(I.grid)
+        ax1.plot(np.array(I.magnetization) / I.grid.size)
+```
+
+```python
+I = IsingModel(2)
+I.run(64*64*100)
+I.plot()
 ```
