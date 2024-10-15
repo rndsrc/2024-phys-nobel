@@ -106,5 +106,28 @@ The recognition of the Hopfield network in the 2024 Nobel Prize highlights this 
 The ideas from statistical mechanics, particularly the energy minimization concepts of the Ising model, laid the groundwork for significant advances in understanding how networks of simple elements---whether spins or neurons---can produce complex, emergent behavior.
 
 ```python
+class HopfieldNetwork:
+    def __init__(self, shape=(64,64)):
+        size = np.prod(shape)
+        self.shape   = shape
+        self.weights = np.zeros((size, size))
 
+    def train(self, patterns):
+        for p in patterns:
+            p = np.reshape(p, (self.weights.shape[0], 1)) # reshape the pattern to a column vector
+            self.weights += np.dot(p, p.T)                # Hebbian learning rule: W += p * p.T
+        np.fill_diagonal(self.weights, 0) # ensure no neuron connects to itself
+        self.weights /= len(patterns)     # normalize by the number of patterns
+
+    def init(self):
+        self.grid = np.random.choice([-1,1], size=self.shape)
+
+    def step(self):
+        i = np.random.randint(0, self.shape[0])
+        j = np.random.randint(0, self.shape[1])
+        self.grid[i,j] = np.sign(np.dot(self.weights[i*self.shape[1]+j,:], self.grid.flatten()))
+
+    def run(self, N):
+        for n in range(N):            
+            self.step()
 ```
