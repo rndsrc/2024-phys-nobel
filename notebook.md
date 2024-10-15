@@ -16,7 +16,7 @@ jupyter:
 # Jupyter Notebook for the 2024 Nobel Prize in Physics
 
 
-## Historical Introduction to the Ising Model
+## Introduction to the Ising Model
 
 The Ising model is a mathematical model in statistical mechanics, introduced by Wilhelm Lenz in 1920 and solved for the one-dimensional case by his student Ernst Ising in 1925. The model was originally used to explain ferromagnetism, where magnetic materials exhibit spontaneous magnetization due to interactions between neighboring atomic spins.
 
@@ -28,17 +28,60 @@ Since then, the Ising model has become one of the most widely studied models in 
 
 The Metropolis algorithm (1953) was developed for Monte Carlo simulations of systems like the Ising model, enabling the study of large, complex systems by simulating their thermal fluctuations and statistical properties. This method revolutionized computational physics and remains a powerful tool in many areas of research today.
 
-In this hands-on lab, we will implement the Ising model using the Metropolis algorithm in Python.
-
 
 ## An Implementation of an Ising Model
 
-The Ising model is pretty simple so we only need to use two packages, `numpy` for array handing and `matplotlib` for plotting.
+In this hands-on lab, we will implement the Ising model using the Metropolis algorithm in Python.
+
+### Energy Function of the Ising Model
+
+The total energy of a spin configuration in the Ising model is given by the following Hamiltonian (energy function):
+$$
+E = - \sum_{\langle i,j \rangle} J_{ij} s_i s_j - \mu \sum_i h_i s_i,
+$$
+where:
+* $s_i$ is the spin at site $i$, which takes the value +1 or -1.
+* $J_{ij}$ is the coupling constant between neighboring spins $i$ and $j$. This parameter determines how strongly the spins influence each other. Positive $J_{ij}$ indicates ferromagnetic coupling (spins prefer to align), while negative $J_{ij}$ indicates antiferromagnetic coupling (spins prefer to be anti-aligned).
+* $\langle i,j \rangle$  represents the sum over all nearest neighbors.
+* $h_i$ is the external magnetic field applied to spin $s_i$.
+* $\mu$ is a constant related to the magnetic moment of the spins.
+
+The system tries to minimize its total energy $E$.
+In the absence of an external field $(h_i = 0)$, the model behaves purely based on the interaction between neighboring spins.
+In regions where $J_{ij} > 0$, spins tend to align, either all pointing up (+1) or all pointing down (-1).
+
+### Energy Change Due to Spin Flip
+
+When a single spin $s_i$ flips, the change in energy is calculated by comparing the energy before and after the flip. The energy difference $\Delta E$ due to flipping the spin at site $i$ is:
+$$
+\Delta E = 2 s_i \sum_{\langle i,j \rangle} J_{ij} s_j,
+$$
+where the sum is over the nearest neighbors $j$ of site $i$.
+The factor of 2 arises because flipping the spin at site $i$ changes its contribution to the energy from $-s_i s_j$ to $+s_i s_j$.
+
+### Metropolis Algorithm
+
+To simulate the evolution of the system at a given temperature, we use the Metropolis algorithm.
+This algorithm probabilistically accepts or rejects a spin flip based on the energy change  $\Delta E$ and the temperature $T$.
+The probability of accepting a spin flip is given by the Boltzmann factor:
+$$
+P(\text{flip}) =
+\begin{cases}
+1 & \text{if } \Delta E < 0, \\
+\exp\left(-\frac{\Delta E}{k_B T}\right) & \text{if } \Delta E \geq 0,
+\end{cases}
+$$
+where:
+* $\Delta E$ is the energy change caused by the flip.
+* $k_\mathrm{B}$ is the Boltzmann constant.
+* $T$ is the temperature.
+This allows the system to "explore" higher energy states at higher temperatures (thermal fluctuations), while favoring low-energy configurations as the system cools down.
+
+Given that the Ising model is pretty simple, we only need to use two packages, `numpy` for array handing and `matplotlib` for plotting.
 
 ```python
 import numpy as np
 from matplotlib import pyplot as plt
-from PIL import Image
 ```
 
 For easy comparison of simulation paramaters, we will implement the Ising model as a class.
@@ -67,9 +110,13 @@ class IsingModel:
         )
 
     @staticmethod
-    def step(state, i,j, T):
+    def flip(state, i,j, T):
         dE = IsingModel.dE(state, i,j)
-        if dE < 0 or np.random.rand() < np.exp(-dE / T):
+        return dE < 0 or np.random.rand() < np.exp(-dE / T)
+
+    @staticmethod
+    def step(state, i,j, T):
+        if IsingModel.flip(state, i,j, T):
             state[i,j] *= -1
 
     def run(self, N):
@@ -109,6 +156,10 @@ In fact, the mathematical structure of the energy function in a Hopfield network
 
 The recognition of the Hopfield network in the 2024 Nobel Prize highlights this elegant crossover between physics and neural computation.
 The ideas from statistical mechanics, particularly the energy minimization concepts of the Ising model, laid the groundwork for significant advances in understanding how networks of simple elements---whether spins or neurons---can produce complex, emergent behavior.
+
+```python
+from PIL import Image
+```
 
 ```python
 class HopfieldNetwork:
