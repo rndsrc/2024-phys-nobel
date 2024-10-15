@@ -38,6 +38,7 @@ The Ising model is pretty simple so we only need to use two packages, `numpy` fo
 ```python
 import numpy as np
 from matplotlib import pyplot as plt
+from PIL import Image
 ```
 
 For easy comparison of simulation paramaters, we will implement the Ising model as a class.
@@ -128,6 +129,22 @@ class HopfieldNetwork:
         self.grid[i,j] = np.sign(np.dot(self.weights[i*self.shape[1]+j,:], self.grid.flatten()))
 
     def run(self, N):
-        for n in range(N):            
+        for n in range(N):
             self.step()
+```
+
+```python
+with Image.open("A.png") as f:
+    A = (np.array(f)[::4,::4,0] >= 128).astype(int) * 2 - 1
+
+with Image.open("C.png") as f:
+    C = (np.array(f)[::4,::4,0] >= 128).astype(int) * 2 - 1
+
+fig, (ax0, ax1) = plt.subplots(1,2)
+ax0.imshow(A)
+ax1.imshow(C)
+```
+
+```python
+
 ```
