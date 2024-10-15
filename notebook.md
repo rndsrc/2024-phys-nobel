@@ -47,11 +47,14 @@ For easy comparison of simulation paramaters, we will implement the Ising model 
 class IsingModel:
 
     def __init__(self, T, shape=(64,64)):
-        self.T = T
-        self.state = np.zeros(shape)
+        self.T     = T
+        self.shape = shape
+        self.state = None
 
-    def init(self):
-        self.state = np.random.choice([-1,1], size=self.state.shape)
+    def random(self, seed=None):
+        if seed is not None:
+            random.seed(seed)
+        self.state = np.random.choice([-1,1], size=self.shape)
 
     @staticmethod
     def dE(state, i,j):
@@ -71,8 +74,8 @@ class IsingModel:
 
     def run(self, N):
         for n in range(N):
-            i = np.random.randint(0, self.state.shape[0])
-            j = np.random.randint(0, self.state.shape[1])
+            i = np.random.randint(0, self.shape[0])
+            j = np.random.randint(0, self.shape[1])
             self.step(self.state, i, j, self.T)
 ```
 
@@ -81,7 +84,7 @@ I = IsingModel(1)
 ```
 
 ```python
-I.init()
+I.random()
 I.run(64*64*100)
 plt.imshow(I.state)
 ```
@@ -110,28 +113,32 @@ The ideas from statistical mechanics, particularly the energy minimization conce
 ```python
 class HopfieldNetwork:
     def __init__(self, shape=(64,64)):
-        self.state   = np.zeros(shape)
-        self.weights = np.zeros((self.state.size, self.state.size))
+        self.W     = 0.0
+        self.shape = shape
+        self.state = None
+
+    def random(self, seed=None):
+        if seed is not None:
+            random.seed(seed)
+        self.state = np.random.choice([-1,1], size=self.shape)
 
     def train(self, patterns):
         for p in patterns:
+            assert p.shape == self.shape
             p = p.flatten()
-            self.weights += np.outer(p, p) # Hebbian learning rule
-        np.fill_diagonal(self.weights, 0)  # ensure no neuron connects to itself
-        self.weights /= len(patterns)      # normalize by the number of patterns
-
-    def init(self):
-        self.state = np.random.choice([-1,1], size=self.state.shape)
+            self.W += np.outer(p, p) # Hebbian learning rule
+        np.fill_diagonal(self.W, 0)  # ensure no neuron connects to itself
+        self.W /= len(patterns)      # normalize by the number of patterns
 
     @staticmethod
-    def step(state, i, j, weights):
-        state[i,j] = np.sign(np.dot(weights[i*state.shape[1]+j], state.flatten()))
+    def step(state, i, j, W):
+        state[i,j] = np.sign(np.dot(W[i*state.shape[1]+j], state.flatten()))
 
     def run(self, N):
         for n in range(N):
-            i = np.random.randint(0, self.state.shape[0])
-            j = np.random.randint(0, self.state.shape[1])
-            self.step(self.state, i, j, self.weights)
+            i = np.random.randint(0, self.shape[0])
+            j = np.random.randint(0, self.shape[1])
+            self.step(self.state, i, j, self.W)
 ```
 
 ```python
@@ -152,13 +159,17 @@ h.train([A, C])
 ```
 
 ```python
-h.init()
+h.random()
 h.run(256*256)
 plt.imshow(h.state)
 ```
 
 ```python
-h.init()
+h.random()
 h.run(256*256)
 plt.imshow(h.state)
+```
+
+```python
+
 ```
