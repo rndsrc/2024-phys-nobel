@@ -11,3 +11,14 @@ and understand the scientific achievements behind this prize through
 interactive, hands-on learning.
 The target audience is advanced undergraduate and graduate students in
 the fields of physical science and computer science.
+
+The Jupyter notebook is synced to a markdown file using `jupytext`.
+If you clone this repository from GitHub, please run
+```
+python3 -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+jupytext --sync notebook.md
+jupyter lab notebook.ipynb
+```
+to access the notebook.
