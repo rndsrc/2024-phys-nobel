@@ -157,12 +157,52 @@ In fact, the mathematical structure of the energy function in a Hopfield network
 The recognition of the Hopfield network in the 2024 Nobel Prize highlights this elegant crossover between physics and neural computation.
 The ideas from statistical mechanics, particularly the energy minimization concepts of the Ising model, laid the groundwork for significant advances in understanding how networks of simple elements---whether spins or neurons---can produce complex, emergent behavior.
 
+### Energy Function of the Hopfield Network
+
+The energy of a Hopfield network is given by a Hamiltonian similar to that of the Ising model:
+$$
+E = - \sum_{i \neq j} W_{ij} \sigma_i \sigma_j - \sum_i \theta_i \sigma_i,
+$$
+where:
+* $\sigma_i$ is the state of neuron $i$, taking values +1 or -1.
+* $W_{ij}$ represents the connection strength (synaptic weight) between neurons $i$ and $j$.
+* $\theta_i$ is the threshold value for neuron $i$.
+
+The network evolves to minimize this energy function, analogous to how the Ising model minimizes its energy through spin alignment.
+
+### Energy Change in the Hopfield Network
+
+When a single neuron $\sigma_i$ flips, the change in energy is:
+$$
+\Delta E = 2 \sigma_i \sum_j W_{ij} \sigma_j.
+$$
+Similar to the Ising model, this energy change depends on the state of neighboring neurons and their connection strengths.
+
+### Hebbian Learning Rule
+
+The weights in a Hopfield network are learned using the Hebbian learning rule, which strengthens the connections between neurons that are activated together.
+The weights are calculated as:
+$$
+W_{ij} = \frac{1}{P} \sum_p \sigma_i^p \sigma_j^p
+$$
+Where:
+* $N$ is the number of neurons.
+* $P$ is the number of patterns.
+* $\sigma_i^p$ is the state of neuron $i$ in a pattern $p$.
+
+This ensures that when the network is presented with an input similar to one of the stored patterns, it evolves toward that pattern by minimizing its energy.
+
+In order to provide some interesting example images, we important an additional packages `pillow`.
+
 ```python
 from PIL import Image
 ```
 
+Similar to the Ising model, we then implement the Hopfield Network in a class.
+
 ```python
 class HopfieldNetwork:
+    
     def __init__(self, shape=(64,64)):
         self.W     = 0.0
         self.shape = shape
@@ -192,6 +232,9 @@ class HopfieldNetwork:
             self.step(self.state, i, j, self.W)
 ```
 
+To provide an interesting demo, we use `pillow` to load two png files.
+They are U of A and wildcat logos.
+
 ```python
 with Image.open("A.png") as f:
     A = (np.array(f)[::4,::4,0] >= 128).astype(int) * 2 - 1
@@ -204,16 +247,14 @@ ax0.imshow(A)
 ax1.imshow(C)
 ```
 
+We then create a Hopfield Network and "train" it with the two logos.
+
 ```python
 h = HopfieldNetwork()
 h.train([A, C])
 ```
 
-```python
-h.random()
-h.run(256*256)
-plt.imshow(h.state)
-```
+Then, by randomly initializing the state of the network, we can recover one of the logos.
 
 ```python
 h.random()
@@ -222,5 +263,7 @@ plt.imshow(h.state)
 ```
 
 ```python
-
+h.random()
+h.run(256*256)
+plt.imshow(h.state)
 ```
