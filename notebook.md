@@ -146,5 +146,22 @@ ax1.imshow(C)
 ```
 
 ```python
+h = HopfieldNetwork()
+h.train([A,C])
+```
+
+```python
+h.init()
+h.run(256*256)
+plt.imshow(h.grid)
+```
+
+```python
+h.init()
+h.run(256*256)
+plt.imshow(h.grid)
+```
+
+```python
 
 ```
