@@ -96,17 +96,15 @@ class IsingModel:
 
     def random(self, seed=None):
         if seed is not None:
-            random.seed(seed)
+            np.random.seed(seed)
         self.state = np.random.choice([-1,1], size=self.shape)
 
     @staticmethod
     def dE(state, i,j):
         I,J = state.shape
         return 2 * state[i,j] * (
-            state[ i     ,(j-1)%J] +
-            state[ i     ,(j+1)%J] +
-            state[(i-1)%I, j     ] +
-            state[(i+1)%I, j     ]
+            state[i, (j+1)%J] + state[(i+1)%I, j] +
+            state[i, (j-1)%J] + state[(i-1)%I, j]
         )
 
     @staticmethod
@@ -139,7 +137,61 @@ plt.imshow(I.state)
 ```python
 # TODO: instead of just visualizing the final output, implement a loop to create a movie
 
-...
+I.random()
+
+for i in range(100):
+    plt.imshow(I.state)
+    I.run(64*64)
+    plt.savefig(f"{i:04d}.png")
+    plt.close()
+```
+
+```python
+# TODO: plot magnetization, i.e., sum(state) / state.size, as a function of step
+
+def magnetization(s):
+    return np.sum(s) / s.size
+```
+
+```python
+I = IsingModel(3)
+I.random()
+
+M = []
+for i in range(100):
+    I.run(64*64)
+    M.append(magnetization(I.state))
+```
+
+```python
+plt.plot(M)
+```
+
+```python
+# TODO: plot magnetization for different temperature
+
+def magnetization_vs_t(T):
+    I = IsingModel(T)
+    I.random()
+
+    M = []
+    for i in range(200):
+        I.run(64*64)
+        M.append(magnetization(I.state))
+    return M
+```
+
+```python
+M1 = magnetization_vs_t(1)
+M2 = magnetization_vs_t(2)
+M3 = magnetization_vs_t(3)
+```
+
+```python
+plt.plot(M1, label='T=1')
+plt.plot(M2, label='T=2')
+plt.plot(M3, label='T=3')
+plt.legend()
 ```
 
 ## Hopfield Network
@@ -208,16 +260,16 @@ Similar to the Ising model, we then implement the Hopfield Network in a class.
 
 ```python
 class HopfieldNetwork:
-    
+
     def __init__(self, shape=(64,64)):
         self.W     = 0.0
         self.shape = shape
         self.state = None
 
-    def random(self, seed=None):
+    def random(self, seed=None, threshold=0.5):
         if seed is not None:
-            random.seed(seed)
-        self.state = np.random.choice([-1,1], size=self.shape)
+            np.random.seed(seed)
+        self.state = (np.random.uniform(size=self.shape) > threshold).astype(int) * 2 - 1
 
     def train(self, patterns):
         for p in patterns:
@@ -242,11 +294,14 @@ To provide an interesting demo, we use `pillow` to load two png files.
 They are U of A and wildcat logos.
 
 ```python
-with Image.open("A.png") as f:
-    A = (np.array(f)[::4,::4,0] >= 128).astype(int) * 2 - 1
+def load(fname):
+    with Image.open(fname) as f:
+        return (np.array(f)[::4,::4,0] > 128).astype(int) * 2 - 1
+```
 
-with Image.open("C.png") as f:
-    C = (np.array(f)[::4,::4,0] >= 128).astype(int) * 2 - 1
+```python
+A = load("A.png")
+C = load("C.png")
 
 fig, (ax0, ax1) = plt.subplots(1,2)
 ax0.imshow(A)
@@ -277,20 +332,43 @@ plt.imshow(h.state)
 ```python
 # TODO: load up more images/patterns to train the Hopfield Network
 
-...
+B = load("basketball.jpg")
+plt.imshow(B)
+```
+
+```python
+h = HopfieldNetwork()
+h.train([A, B, C])
+```
+
+```python
+h.random()
+h.run(256*256*10)
+plt.imshow(h.state)
 ```
 
 ```python
 # TODO: implement some control to the radom state so they are more likely
 # to converge to a particular image
 
-...
+h.random(seed=8)
+h.run(256*256)
+plt.imshow(h.state)
 ```
 
 ```python
 # TODO: instead of just visualizing the final output, implement a loop to create a movie
 
-...
+h = HopfieldNetwork()
+h.train([A, C])
+
+h.random()
+
+for i in range(16*16):
+    h.run(16*16)
+    plt.imshow(h.state)
+    plt.savefig(f"{i:04d}.png")
+    plt.close()
 ```
 
 ## Boltzmann Machine
