@@ -102,17 +102,12 @@ class IsingModel:
     @staticmethod
     def dE(state, i,j):
         I,J = state.shape
-        return 2 * state[i,j] * (
-            state[ i     ,(j-1)%J] +
-            state[ i     ,(j+1)%J] +
-            state[(i-1)%I, j     ] +
-            state[(i+1)%I, j     ]
-        )
+        return ... # TODO: implement the change of energy
 
     @staticmethod
     def flip(state, i,j, T):
         dE = IsingModel.dE(state, i,j)
-        return dE < 0 or np.random.rand() < np.exp(-dE / T)
+        return ... # TODO: implement the probability of accepting a spin flip
 
     @staticmethod
     def step(state, i,j, T):
@@ -138,6 +133,18 @@ plt.imshow(I.state)
 
 ```python
 # TODO: instead of just visualizing the final output, implement a loop to create a movie
+
+...
+```
+
+```python
+# TODO: plot magnetization, i.e., sum(state) / state.size, as a function of step
+
+...
+```
+
+```python
+# TODO: plot magnetization for different temperature
 
 ...
 ```
@@ -222,8 +229,7 @@ class HopfieldNetwork:
     def train(self, patterns):
         for p in patterns:
             assert p.shape == self.shape
-            p = p.flatten()
-            self.W += np.outer(p, p) # Hebbian learning rule
+            ... # TODO: implement the Hebbian learning rule
         np.fill_diagonal(self.W, 0)  # ensure no neuron connects to itself
         self.W /= len(patterns)      # normalize by the number of patterns
 
@@ -243,10 +249,10 @@ They are U of A and wildcat logos.
 
 ```python
 with Image.open("A.png") as f:
-    A = (np.array(f)[::4,::4,0] >= 128).astype(int) * 2 - 1
+    A = ... # TODO: turn image into bitmap
 
 with Image.open("C.png") as f:
-    C = (np.array(f)[::4,::4,0] >= 128).astype(int) * 2 - 1
+    C = ... # TODO: turn image into bitmap
 
 fig, (ax0, ax1) = plt.subplots(1,2)
 ax0.imshow(A)
