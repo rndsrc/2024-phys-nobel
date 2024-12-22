@@ -13,6 +13,9 @@ jupyter:
     name: python3
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rndsrc/2024-phys-nobel/blob/main/notebook.ipynb)
+
+
 # Jupyter Notebook for the 2024 Nobel Prize in Physics
 
 
