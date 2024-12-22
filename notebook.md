@@ -303,19 +303,19 @@ def load(fname):
 ```
 
 ```python
-A = load("A.png")
-C = load("C.png")
+img1 = load("ych2ss.jpg")
+img2 = load("computer.jpg")
 
 fig, (ax0, ax1) = plt.subplots(1,2)
-ax0.imshow(A)
-ax1.imshow(C)
+ax0.imshow(img1)
+ax1.imshow(img2)
 ```
 
 We then create a Hopfield Network and "train" it with the two logos.
 
 ```python
 h = HopfieldNetwork()
-h.train([A, C])
+h.train([img1, img2])
 ```
 
 Then, by randomly initializing the state of the network, we can recover one of the logos.
@@ -335,13 +335,13 @@ plt.imshow(h.state)
 ```python
 # TODO: load up more images/patterns to train the Hopfield Network
 
-B = load("basketball.jpg")
-plt.imshow(B)
+img3 = load("AI.jpg")
+plt.imshow(img3)
 ```
 
 ```python
 h = HopfieldNetwork()
-h.train([A, B, C])
+h.train([img1, img2, img3])
 ```
 
 ```python
@@ -363,7 +363,7 @@ plt.imshow(h.state)
 # TODO: instead of just visualizing the final output, implement a loop to create a movie
 
 h = HopfieldNetwork()
-h.train([A, C])
+h.train([img1, img2])
 
 h.random()
 
