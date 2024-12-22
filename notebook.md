@@ -85,6 +85,7 @@ Given that the Ising model is pretty simple, we only need to use two packages, `
 ```python
 import numpy as np
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 ```
 
 For easy comparison of simulation paramaters, we will implement the Ising model as a class.
@@ -140,7 +141,7 @@ plt.imshow(I.state)
 ```python
 I.random()
 
-for i in range(100):
+for i in tqdm(range(100)):
     plt.imshow(I.state)
     I.run(64*64)
     plt.savefig(f"{i:04d}.png")
@@ -150,7 +151,7 @@ for i in range(100):
 Use `ffmpeg` to convert images to movie
 
 ```python
-! ffmpeg -i %04d.png -qmax 2 Ising.mpg
+! ffmpeg -i %04d.png -qmax 2 Ising.mpg && rm *.png
 ```
 
 Download from colab
@@ -180,8 +181,6 @@ plt.plot(M)
 ```
 
 ```python
-# TODO: plot magnetization for different temperature
-
 def magnetization_vs_t(T):
     I = IsingModel(T)
     I.random()
@@ -377,7 +376,7 @@ h.train([img1, img2])
 
 h.random()
 
-for i in range(16*16):
+for i in tqdm(range(16*16)):
     h.run(16*16)
     plt.imshow(h.state)
     plt.savefig(f"{i:04d}.png")
@@ -385,7 +384,7 @@ for i in range(16*16):
 ```
 
 ```python
-! ffmpeg -i %04d.png -qmax 2 Hopfield.mpg
+! ffmpeg -i %04d.png -qmax 2 Hopfield.mpg && rm *.png
 ```
 
 ```python
