@@ -253,7 +253,15 @@ Where:
 
 This ensures that when the network is presented with an input similar to one of the stored patterns, it evolves toward that pattern by minimizing its energy.
 
-In order to provide some interesting example images, we important an additional packages `pillow`.
+To provide some interesting example images, we first download some sample images:
+
+```python
+! if [ ! -f ych2ss.jpg   ]; then wget https://raw.githubusercontent.com/rndsrc/2024-phys-nobel/refs/heads/sol/ych2ss.jpg;   fi
+! if [ ! -f computer.jpg ]; then wget https://raw.githubusercontent.com/rndsrc/2024-phys-nobel/refs/heads/sol/computer.jpg; fi
+! if [ ! -f AI.jpg       ]; then wget https://raw.githubusercontent.com/rndsrc/2024-phys-nobel/refs/heads/sol/AI.jpg;       fi
+```
+
+We then important an additional packages `pillow`.
 
 ```python
 from PIL import Image
